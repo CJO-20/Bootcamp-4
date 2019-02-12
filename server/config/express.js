@@ -8,7 +8,7 @@ var path = require('path'),
 
 module.exports.init = function() {
   //connect to database
-  mongoose.connect(config.db.uri);
+  mongoose.connect(config.db.uri, { promiseLibrary: global.Promise });
 
   //initialize app
   var app = express();
@@ -22,14 +22,19 @@ module.exports.init = function() {
   
   /**TODO
   Serve static files */
+  app.use('/', express.static(__dirname + '/../../client'));
+  app.use('/public', express.static(__dirname + '/../../public'));
   
 
   /**TODO 
   Use the listings router for requests to the api */
-
+  app.use('/api/listings', listingsRouter);
 
   /**TODO 
   Go to homepage for all routes not specified */ 
+  app.all('/*', function(req, res) {
+    res.sendFile(path.resolve('client/index.html'));
+  });
 
   return app;
 };  
